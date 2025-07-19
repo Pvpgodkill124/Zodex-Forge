@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zodex Forge Builder</title>
+  <link rel="stylesheet" href="builder.css" />
+</head>
+<body>
+  <header>
+    <h1>Zodex Forge Builder</h1>
+    <p>Create your app your way 🚀</p>
+  </header>
+
+  <main>
+    <div class="mode-card" onclick="openEditor('code')">
+      <h2>Code Mode</h2>
+      <p>Use HTML, CSS, JS or XML to code your app directly.</p>
+    </div>
+
+    <div class="mode-card" onclick="comingSoon('scratch')">
+      <h2>Scratch Mode</h2>
+      <p>Drag & Drop logic blocks. No coding needed.</p>
+    </div>
+
+    <div class="mode-card" onclick="openEditor('pwa')">
+      <h2>PWA Mode</h2>
+      <p>Start building a Progressive Web App with service workers.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Made with 🔥 by DR1TRA-GAMING & Andrew</p>
+  </footer>
+
+  <script>
+    function openEditor(mode) {
+      // Later we’ll load different editors
+      alert("Opening " + mode + " editor (in development)...");
+      // Example: window.location.href = mode + "-editor.html";
+    }
+
+    function comingSoon(name) {
+      alert(name + " Mode is coming soon 💡");
+    }
+  </script>
+</body>
+</html>
