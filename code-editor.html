@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zodex Code Editor</title>
+  <link rel="stylesheet" href="code-editor.css" />
+</head>
+<body>
+  <header>
+    <h1>Code Mode – Zodex Forge</h1>
+    <p>Write HTML, CSS & JS. Preview in real-time.</p>
+  </header>
+
+  <main>
+    <div class="editor-section">
+      <label>HTML</label>
+      <textarea id="htmlCode" placeholder="Write HTML here..."></textarea>
+
+      <label>CSS</label>
+      <textarea id="cssCode" placeholder="Write CSS here..."></textarea>
+
+      <label>JavaScript</label>
+      <textarea id="jsCode" placeholder="Write JS here..."></textarea>
+
+      <button onclick="runCode()">▶ Run Code</button>
+    </div>
+
+    <div class="preview-section">
+      <h2>Live Preview 👇</h2>
+      <iframe id="preview"></iframe>
+    </div>
+  </main>
+
+  <footer>
+    <p>Made with 🔥 by DR1TRA-GAMING & Andrew</p>
+  </footer>
+
+  <script>
+    function runCode() {
+      const html = document.getElementById("htmlCode").value;
+      const css = `<style>${document.getElementById("cssCode").value}</style>`;
+      const js = `<script>${document.getElementById("jsCode").value}<\/script>`;
+      const output = html + css + js;
+      const iframe = document.getElementById("preview");
+      iframe.srcdoc = output;
+    }
+  </script>
+</body>
+</html>
