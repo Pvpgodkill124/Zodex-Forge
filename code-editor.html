@@ -62,6 +62,25 @@
   <button onclick="saveCode()">💾 Save Code</button>
   <button onclick="loadCode()">📂 Load Code</button>
   </div>
+  <!-- Export Modal -->
+<div id="exportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
+  <div style="background:#1a1a1a; padding:20px; border-radius:8px; width:300px; box-shadow:0 0 10px #00ff88;">
+    <h3 style="margin-top:0; color:#0f0;">Export</h3>
+    <label for="fileName">File name</label>
+    <input id="fileName" type="text" value="zodex-app" style="width:100%; margin:10px 0; padding:6px; background:#121212; color:#0f0; border:1px solid #2e2e2e;" />
+    <label for="fileType">Format</label>
+    <select id="fileType" style="width:100%; margin:10px 0; padding:6px; background:#121212; color:#0f0;">
+      <option value="html">.html</option>
+      <option value="css">.css</option>
+      <option value="pdf">.pdf</option>
+    </select>
+    <button onclick="exportCode()" style="width:100%; padding:8px; background:#00ff88; border:none; color:#000; font-weight:bold; margin-top:10px;">Download</button>
+    <button onclick="closeExportModal()" style="width:100%; padding:8px; background:#333; border:none; color:#fff; margin-top:5px;">Cancel</button>
+  </div>
+</div>
+
+<!-- Floating Export Button -->
+<button onclick="openExportModal()" style="position:fixed; bottom:20px; right:20px; padding:12px 20px; background:#00ff88; color:#000; border:none; font-weight:bold; border-radius:8px; box-shadow:0 0 10px #00ff88;">Export</button>
   <footer>✨ Live Preview Enabled | V2 – The Code Awakens</footer>
   <script>
     const input = document.getElementById("codeInput");
@@ -101,6 +120,41 @@ function loadCode() {
     alert('❌ No saved code found!');
   }
 }
+    
+function openExportModal() {
+    document.getElementById("exportModal").style.display = "flex";
+  }
+
+  function closeExportModal() {
+    document.getElementById("exportModal").style.display = "none";
+  }
+
+  function exportCode() {
+    const code = document.getElementById("codeInput").value;
+    const name = document.getElementById("fileName").value || "zodex-app";
+    const type = document.getElementById("fileType").value;
+
+    let blob;
+    if (type === "pdf") {
+      // Basic text PDF export (not styled preview)
+      const win = window.open('', '_blank');
+      win.document.write('<pre>' + code.replace(/</g, "&lt;") + '</pre>');
+      win.document.close();
+      win.print();
+      return;
+    } else {
+      blob = new Blob([code], { type: type === "html" ? "text/html" : "text/css" });
+    }
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = name + "." + type;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    closeExportModal();
+  }
+
   </script>
 </body>
 </html>
