@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -43,6 +44,27 @@
       background: #fff;
       width: 50%;
     }
+    .editor-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      background: #181818;
+      border-top: 1px solid #2e2e2e;
+    }
+    .editor-controls button {
+      background: #00ff88;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .editor-controls button:hover {
+      background: #00cc6a;
+    }
     footer {
       padding: 10px;
       background: #121212;
@@ -53,50 +75,59 @@
   </style>
 </head>
 <body>
-  <div class="editor-controls">
-  <button onclick="saveProject()">💾 Save</button>
-  <button onclick="loadProject()">🔁 Load</button>
-  <button onclick="clearProject()">🧼 Clear</button>
-  </div>
   <header>🚀 Zodex Forge – Code Editor</header>
+  
+  <div class="editor-controls">
+    <button onclick="saveProject()">💾 Save</button>
+    <button onclick="loadProject()">🔁 Load</button>
+    <button onclick="clearProject()">🧼 Clear</button>
+  </div>
+
   <div class="editor-container">
     <textarea class="editor" id="codeInput" placeholder="<html>\n  <head>...</head>\n  <body>...</body>\n</html>"></textarea>
     <iframe class="preview" id="preview"></iframe>
   </div>
-  <div style="background:#121212; padding:10px; display:flex; gap:10px; justify-content:center;">
-  <button onclick="saveCode()">💾 Save Code</button>
-  <button onclick="loadCode()">📂 Load Code</button>
-  </div>
-  <!-- Export Modal -->
-<div id="exportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
-  <div style="background:#1a1a1a; padding:20px; border-radius:8px; width:300px; box-shadow:0 0 10px #00ff88;">
-    <h3 style="margin-top:0; color:#0f0;">Export</h3>
-    <label for="fileName">File name</label>
-    <input id="fileName" type="text" value="zodex-app" style="width:100%; margin:10px 0; padding:6px; background:#121212; color:#0f0; border:1px solid #2e2e2e;" />
-    <label for="fileType">Format</label>
-    <select id="fileType" style="width:100%; margin:10px 0; padding:6px; background:#121212; color:#0f0;">
-      <option value="html">.html</option>
-      <option value="css">.css</option>
-      <option value="pdf">.pdf</option>
-    </select>
-    <button onclick="exportCode()" style="width:100%; padding:8px; background:#00ff88; border:none; color:#000; font-weight:bold; margin-top:10px;">Download</button>
-    <button onclick="closeExportModal()" style="width:100%; padding:8px; background:#333; border:none; color:#fff; margin-top:5px;">Cancel</button>
-  </div>
-</div>
 
-<!-- Floating Export Button -->
-<button onclick="openExportModal()" style="position:fixed; bottom:20px; right:20px; padding:12px 20px; background:#00ff88; color:#000; border:none; font-weight:bold; border-radius:8px; box-shadow:0 0 10px #00ff88;">Export</button>
   <footer>✨ Live Preview Enabled | V2 – The Code Awakens</footer>
+
   <script>
     const input = document.getElementById("codeInput");
-    const preview = document.getElementById("preview");input.addEventListener("input", () => {
-  const content = input.value;
-  preview.srcdoc = content;
-});
+    const preview = document.getElementById("preview");
 
-// Optional default template
-input.value = `<!DOCTYPE html>
+    // Live Preview
+    input.addEventListener("input", () => {
+      preview.srcdoc = input.value;
+    });
 
+    // Save System
+    function saveProject() {
+      const code = input.value;
+      localStorage.setItem("zodex_forge_code", code);
+      alert("💾 Code Saved Successfully!");
+    }
+
+    function loadProject() {
+      const savedCode = localStorage.getItem("zodex_forge_code");
+      if (savedCode) {
+        input.value = savedCode;
+        preview.srcdoc = savedCode;
+        alert("🔁 Code Loaded Successfully!");
+      } else {
+        alert("⚠️ No saved code found.");
+      }
+    }
+
+    function clearProject() {
+      if (confirm("Are you sure you want to clear the code and saved version?")) {
+        input.value = "";
+        preview.srcdoc = "";
+        localStorage.removeItem("zodex_forge_code");
+        alert("🧼 Code Cleared!");
+      }
+    }
+
+    // Default Template
+    const defaultTemplate = `<!DOCTYPE html>
 <html>
 <head>
   <title>Zodex App</title>
@@ -109,85 +140,18 @@ input.value = `<!DOCTYPE html>
   <p>Start building your app now...</p>
 </body>
 </html>`;
-    preview.srcdoc = input.value;
-    function saveCode() {
-  localStorage.setItem('zodex_code', input.value);
-  alert('✅ Code saved!');
-}
 
-function loadCode() {
-  const saved = localStorage.getItem('zodex_code');
-  if (saved) {
-    input.value = saved;
-    preview.srcdoc = saved;
-    alert('📂 Code loaded!');
-  } else {
-    alert('❌ No saved code found!');
-  }
-}
-    
-function openExportModal() {
-    document.getElementById("exportModal").style.display = "flex";
-  }
-
-  function closeExportModal() {
-    document.getElementById("exportModal").style.display = "none";
-  }
-
-  function exportCode() {
-    const code = document.getElementById("codeInput").value;
-    const name = document.getElementById("fileName").value || "zodex-app";
-    const type = document.getElementById("fileType").value;
-
-    let blob;
-    if (type === "pdf") {
-      // Basic text PDF export (not styled preview)
-      const win = window.open('', '_blank');
-      win.document.write('<pre>' + code.replace(/</g, "&lt;") + '</pre>');
-      win.document.close();
-      win.print();
-      return;
-    } else {
-      blob = new Blob([code], { type: type === "html" ? "text/html" : "text/css" });
-    }
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = name + "." + type;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    closeExportModal();
-  }
- 
-  function saveProject() {
-    const code = editor.getValue();
-    localStorage.setItem('zodexCode', code);
-    alert("💾 Code Saved to Browser!");
-  }
-
-  function loadProject() {
-    const savedCode = localStorage.getItem('zodexCode');
-    if (savedCode) {
-      editor.setValue(savedCode);
-      alert("🔁 Code Loaded!");
-    } else {
-      alert("⚠️ No saved code found.");
-    }
-  }
-
-  function clearProject() {
-    if (confirm("Are you sure you want to clear the code and saved version?")) {
-      editor.setValue("");
-      localStorage.removeItem('zodexCode');
-      alert("🧼 Code cleared!");
-    }
-  }
-
-  // Optional: Auto-load on open
-  window.addEventListener("load", loadProject);
-  }
-    
+    // Load saved code or template
+    window.addEventListener("load", () => {
+      const saved = localStorage.getItem("zodex_forge_code");
+      if (saved) {
+        input.value = saved;
+        preview.srcdoc = saved;
+      } else {
+        input.value = defaultTemplate;
+        preview.srcdoc = defaultTemplate;
+      }
+    });
   </script>
 </body>
 </html>
