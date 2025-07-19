@@ -53,6 +53,11 @@
   </style>
 </head>
 <body>
+  <div class="editor-controls">
+  <button onclick="saveProject()">💾 Save</button>
+  <button onclick="loadProject()">🔁 Load</button>
+  <button onclick="clearProject()">🧼 Clear</button>
+  </div>
   <header>🚀 Zodex Forge – Code Editor</header>
   <div class="editor-container">
     <textarea class="editor" id="codeInput" placeholder="<html>\n  <head>...</head>\n  <body>...</body>\n</html>"></textarea>
@@ -154,7 +159,35 @@ function openExportModal() {
     document.body.removeChild(link);
     closeExportModal();
   }
+ 
+  function saveProject() {
+    const code = editor.getValue();
+    localStorage.setItem('zodexCode', code);
+    alert("💾 Code Saved to Browser!");
+  }
 
+  function loadProject() {
+    const savedCode = localStorage.getItem('zodexCode');
+    if (savedCode) {
+      editor.setValue(savedCode);
+      alert("🔁 Code Loaded!");
+    } else {
+      alert("⚠️ No saved code found.");
+    }
+  }
+
+  function clearProject() {
+    if (confirm("Are you sure you want to clear the code and saved version?")) {
+      editor.setValue("");
+      localStorage.removeItem('zodexCode');
+      alert("🧼 Code cleared!");
+    }
+  }
+
+  // Optional: Auto-load on open
+  window.addEventListener("load", loadProject);
+  }
+    
   </script>
 </body>
 </html>
