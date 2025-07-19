@@ -1,157 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zodex Forge – Code Editor</title>
-  <link rel="stylesheet" href="code-editor.css" />
+  <meta charset="UTF-8">
+  <title>Zodex Forge V2 – Code Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       margin: 0;
-      font-family: 'JetBrains Mono', monospace;
-      background: #0e0e0e;
-      color: #f4f4f4;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
     }
+
     header {
-      background: #161616;
-      padding: 10px 20px;
-      font-size: 20px;
+      background: #111;
+      padding: 16px;
+      text-align: center;
+      font-size: 1.5rem;
+      color: #00ff88;
       font-weight: bold;
-      border-bottom: 1px solid #2e2e2e;
+      border-bottom: 2px solid #00ff88;
     }
-    .editor-container {
-      flex: 1;
+
+    #editor-container {
       display: flex;
+      height: calc(100vh - 60px);
     }
-    .editor, .preview {
-      flex: 1;
+
+    #codeInput {
+      width: 50%;
       height: 100%;
+      padding: 12px;
       border: none;
+      resize: none;
       outline: none;
-    }
-    textarea.editor {
       background: #1a1a1a;
       color: #00ff88;
-      padding: 10px;
-      font-size: 14px;
-      resize: none;
-      width: 50%;
+      font-size: 16px;
+      font-family: monospace;
     }
-    iframe.preview {
+
+    #preview {
+      width: 50%;
+      height: 100%;
+      border-left: 2px solid #00ff88;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
       background: #fff;
-      width: 50%;
     }
-    .editor-controls {
+
+    #action-buttons {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
       display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 10px;
-      background: #181818;
-      border-top: 1px solid #2e2e2e;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
     }
-    .editor-controls button {
+
+    .action-btn {
       background: #00ff88;
       color: #000;
       border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
+      padding: 10px 16px;
       font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
-      transition: 0.2s;
+      box-shadow: 0 0 10px #00ff88;
     }
-    .editor-controls button:hover {
-      background: #00cc6a;
+
+    /* Export Popup */
+    #exportPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ff88;
+      z-index: 9999;
+      width: 300px;
     }
-    footer {
-      padding: 10px;
-      background: #121212;
-      text-align: center;
-      font-size: 12px;
-      color: #888;
+
+    #exportPopup h2 {
+      margin-top: 0;
+    }
+
+    #exportPopup input, #exportPopup select {
+      padding: 8px;
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 6px;
+    }
+
+    #exportPopup button {
+      padding: 10px 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    #exportPopup .confirm-btn {
+      background: #00ff88;
+      color: #000;
+    }
+
+    #exportPopup .cancel-btn {
+      background: #444;
+      color: #fff;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
-  <header>🚀 Zodex Forge – Code Editor</header>
-  
-  <div class="editor-controls">
-    <button onclick="saveProject()">💾 Save</button>
-    <button onclick="loadProject()">🔁 Load</button>
-    <button onclick="clearProject()">🧼 Clear</button>
+
+  <header>🚀 Zodex Forge – Code Awakens</header>
+
+  <main id="editor-container">
+    <textarea id="codeInput" placeholder="Write your HTML, CSS, JS here..."></textarea>
+    <div id="preview">
+      <iframe id="livePreview"></iframe>
+    </div>
+  </main>
+
+  <!-- 🔘 Buttons: Save + Export -->
+  <div id="action-buttons">
+    <button class="action-btn" onclick="saveCode()">💾 Save</button>
+    <button class="action-btn" onclick="openExportPopup()">📤 Export</button>
   </div>
 
-  <div class="editor-container">
-    <textarea class="editor" id="codeInput" placeholder="<html>\n  <head>...</head>\n  <body>...</body>\n</html>"></textarea>
-    <iframe class="preview" id="preview"></iframe>
+  <!-- 📦 Export Popup -->
+  <div id="exportPopup">
+    <h2>📤 Export Your Code</h2>
+    <label>File name:</label>
+    <input type="text" id="fileNameInput" value="my-project">
+    <label>File type:</label>
+    <select id="fileTypeSelect">
+      <option value=".html">.html</option>
+      <option value=".css">.css</option>
+      <option value=".js">.js</option>
+      <option value=".txt">.txt</option>
+    </select>
+    <button class="confirm-btn" onclick="exportCode()">✅ Export Now</button>
+    <button class="cancel-btn" onclick="closeExportPopup()">❌ Cancel</button>
   </div>
-
-  <footer>✨ Live Preview Enabled | V2 – The Code Awakens</footer>
 
   <script>
-    const input = document.getElementById("codeInput");
-    const preview = document.getElementById("preview");
-
     // Live Preview
-    input.addEventListener("input", () => {
-      preview.srcdoc = input.value;
-    });
+    const codeInput = document.getElementById('codeInput');
+    const livePreview = document.getElementById('livePreview');
+
+    function updatePreview() {
+      const code = codeInput.value;
+      livePreview.srcdoc = code;
+    }
+
+    codeInput.addEventListener('input', updatePreview);
 
     // Save System
-    function saveProject() {
-      const code = input.value;
-      localStorage.setItem("zodex_forge_code", code);
-      alert("💾 Code Saved Successfully!");
+    function saveCode() {
+      const code = codeInput.value;
+      localStorage.setItem('zodexCode', code);
+      alert('💾 Code saved locally!');
     }
 
-    function loadProject() {
-      const savedCode = localStorage.getItem("zodex_forge_code");
-      if (savedCode) {
-        input.value = savedCode;
-        preview.srcdoc = savedCode;
-        alert("🔁 Code Loaded Successfully!");
-      } else {
-        alert("⚠️ No saved code found.");
-      }
-    }
-
-    function clearProject() {
-      if (confirm("Are you sure you want to clear the code and saved version?")) {
-        input.value = "";
-        preview.srcdoc = "";
-        localStorage.removeItem("zodex_forge_code");
-        alert("🧼 Code Cleared!");
-      }
-    }
-
-    // Default Template
-    const defaultTemplate = `<!DOCTYPE html>
-<html>
-<head>
-  <title>Zodex App</title>
-  <style>
-    body { background: #101010; color: #0f0; font-family: monospace; padding: 20px; }
-  </style>
-</head>
-<body>
-  <h1>Hello from Zodex Forge V2!</h1>
-  <p>Start building your app now...</p>
-</body>
-</html>`;
-
-    // Load saved code or template
-    window.addEventListener("load", () => {
-      const saved = localStorage.getItem("zodex_forge_code");
+    function loadSavedCode() {
+      const saved = localStorage.getItem('zodexCode');
       if (saved) {
-        input.value = saved;
-        preview.srcdoc = saved;
-      } else {
-        input.value = defaultTemplate;
-        preview.srcdoc = defaultTemplate;
+        codeInput.value = saved;
+        updatePreview();
       }
-    });
+    }
+
+    // Export System
+    function openExportPopup() {
+      document.getElementById('exportPopup').style.display = 'block';
+    }
+
+    function closeExportPopup() {
+      document.getElementById('exportPopup').style.display = 'none';
+    }
+
+    function exportCode() {
+      const code = codeInput.value;
+      const fileName = document.getElementById('fileNameInput').value.trim() || 'my-project';
+      const fileType = document.getElementById('fileTypeSelect').value;
+
+      const blob = new Blob([code], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.download = fileName + fileType;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+
+      closeExportPopup();
+    }
+
+    // Load on start
+    window.onload = loadSavedCode;
   </script>
+
 </body>
 </html>
