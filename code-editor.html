@@ -1,50 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zodex Code Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zodex Forge – Code Editor</title>
   <link rel="stylesheet" href="code-editor.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'JetBrains Mono', monospace;
+      background: #0e0e0e;
+      color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #161616;
+      padding: 10px 20px;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 1px solid #2e2e2e;
+    }
+    .editor-container {
+      flex: 1;
+      display: flex;
+    }
+    .editor, .preview {
+      flex: 1;
+      height: 100%;
+      border: none;
+      outline: none;
+    }
+    textarea.editor {
+      background: #1a1a1a;
+      color: #00ff88;
+      padding: 10px;
+      font-size: 14px;
+      resize: none;
+      width: 50%;
+    }
+    iframe.preview {
+      background: #fff;
+      width: 50%;
+    }
+    footer {
+      padding: 10px;
+      background: #121212;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Code Mode – Zodex Forge</h1>
-    <p>Write HTML, CSS & JS. Preview in real-time.</p>
-  </header>
-
-  <main>
-    <div class="editor-section">
-      <label>HTML</label>
-      <textarea id="htmlCode" placeholder="Write HTML here..."></textarea>
-
-      <label>CSS</label>
-      <textarea id="cssCode" placeholder="Write CSS here..."></textarea>
-
-      <label>JavaScript</label>
-      <textarea id="jsCode" placeholder="Write JS here..."></textarea>
-
-      <button onclick="runCode()">▶ Run Code</button>
-    </div>
-
-    <div class="preview-section">
-      <h2>Live Preview 👇</h2>
-      <iframe id="preview"></iframe>
-    </div>
-  </main>
-
-  <footer>
-    <p>Made with 🔥 by DR1TRA-GAMING & Andrew</p>
-  </footer>
-
+  <header>🚀 Zodex Forge – Code Editor</header>
+  <div class="editor-container">
+    <textarea class="editor" id="codeInput" placeholder="<html>\n  <head>...</head>\n  <body>...</body>\n</html>"></textarea>
+    <iframe class="preview" id="preview"></iframe>
+  </div>
+  <footer>✨ Live Preview Enabled | V2 – The Code Awakens</footer>
   <script>
-    function runCode() {
-      const html = document.getElementById("htmlCode").value;
-      const css = `<style>${document.getElementById("cssCode").value}</style>`;
-      const js = `<script>${document.getElementById("jsCode").value}<\/script>`;
-      const output = html + css + js;
-      const iframe = document.getElementById("preview");
-      iframe.srcdoc = output;
-    }
+    const input = document.getElementById("codeInput");
+    const preview = document.getElementById("preview");input.addEventListener("input", () => {
+  const content = input.value;
+  preview.srcdoc = content;
+});
+
+// Optional default template
+input.value = `<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Zodex App</title>
+  <style>
+    body { background: #101010; color: #0f0; font-family: monospace; padding: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Hello from Zodex Forge V2!</h1>
+  <p>Start building your app now...</p>
+</body>
+</html>`;
+    preview.srcdoc = input.value;
   </script>
 </body>
 </html>
