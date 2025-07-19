@@ -13,12 +13,12 @@
   </header>
 
   <main>
-    <div class="mode-card" onclick="window.location.href='code-editor.html'">
+    <div class="mode-card" onclick="openEditor('code')">
       <h2>Code Mode</h2>
       <p>Use HTML, CSS, JS or XML to code your app directly.</p>
     </div>
 
-    <div class="mode-card" onclick="comingSoon('scratch')">
+    <div class="mode-card" onclick="openEditor('scratch')">
       <h2>Scratch Mode</h2>
       <p>Drag & Drop logic blocks. No coding needed.</p>
     </div>
@@ -35,13 +35,13 @@
 
   <script>
     function openEditor(mode) {
-      // Later we’ll load different editors
-      alert("Opening " + mode + " editor (in development)...");
-      // Example: window.location.href = mode + "-editor.html";
-    }
-
-    function comingSoon(name) {
-      alert(name + " Mode is coming soon 💡");
+  if (mode === 'code') {
+    window.location.href = 'code-editor.html';
+  } else if (mode === 'scratch') {
+    window.location.href = 'scratch.html';
+  } else if (mode === 'pwa') {
+    window.location.href = 'pwa-builder.html';
+  }
     }
   </script>
 </body>
