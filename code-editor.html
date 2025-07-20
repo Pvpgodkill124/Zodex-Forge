@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zodex Forge – HTML Editor</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #0f0f0f;
+      color: #00ff99;
+      font-family: 'Courier New', monospace;
+    }
+
+    header {
+      background: #000;
+      color: #00ff99;
+      padding: 12px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .editor {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 40vh;
+      background: #000;
+      color: #00ff99;
+      border: 1px solid #00ff99;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 40vh;
+      background: #1a1a1a;
+      border: 1px solid #00ff99;
+      margin-top: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button {
+      background: #000;
+      color: #00ff99;
+      border: 1px solid #00ff99;
+      padding: 8px 12px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00ff99;
+      color: #000;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      background: #000;
+      border-top: 1px solid #00ff99;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>Zodex Forge – HTML Editor</header>
+
+  <div class="editor">
+    <textarea id="htmlCode" placeholder="Write HTML here..."></textarea>
+    
+    <div class="buttons">
+      <button onclick="openTab('code-css.html')">CSS Editor</button>
+      <button onclick="openTab('code-js.html')">JS Editor</button>
+      <button onclick="saveCode()">💾 Save</button>
+      <button onclick="loadCode()">📂 Load</button>
+      <button onclick="exportCode()">⬇️ Export</button>
+    </div>
+
+    <iframe id="preview"></iframe>
+  </div>
+
+  <footer>DR1TRA-GAMING | Zodex Forge V1</footer>
+
+  <script>
+    const htmlCode = document.getElementById('htmlCode');
+    const preview = document.getElementById('preview');
+
+    htmlCode.addEventListener('input', updatePreview);
+
+    function updatePreview() {
+      const code = htmlCode.value;
+      preview.srcdoc = code;
+    }
+
+    function openTab(page) {
+      window.location.href = page;
+    }
+
+    function saveCode() {
+      localStorage.setItem('zodex-html', htmlCode.value);
+      alert('HTML saved ✅');
+    }
+
+    function loadCode() {
+      const code = localStorage.getItem('zodex-html');
+      if (code) {
+        htmlCode.value = code;
+        updatePreview();
+        alert('Loaded saved HTML');
+      } else {
+        alert('No saved code found');
+      }
+    }
+
+    function exportCode() {
+      const blob = new Blob([htmlCode.value], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'zodex-export.html';
+      a.click();
+    }
+
+    // Auto-load if saved
+    window.onload = () => {
+      const saved = localStorage.getItem('zodex-html');
+      if (saved) {
+        htmlCode.value = saved;
+        updatePreview();
+      }
+    }
+  </script>
+</body>
+</html>
