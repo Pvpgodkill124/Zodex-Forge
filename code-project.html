@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zodex Forge - Projects</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0ff;
+    }
+
+    .project-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .project-card {
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 15px;
+      width: 220px;
+      text-align: center;
+    }
+
+    .project-card h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #0f0;
+    }
+
+    .project-card small {
+      color: #888;
+    }
+
+    .project-card button {
+      margin-top: 10px;
+      background: #333;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .project-card button:hover {
+      background: #555;
+    }
+
+    .new-btn {
+      display: block;
+      margin: 0 auto;
+      background: #0ff;
+      color: #000;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .new-btn:hover {
+      background: #0dd;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🗂️ Your Projects</h1>
+
+  <a class="new-btn" href="code-editor.html?new=true">+ Create New Project</a>
+
+  <div class="project-grid" id="projectList"></div>
+
+  <script>
+    const projectList = document.getElementById("projectList");
+
+    function loadProjects() {
+      const projects = JSON.parse(localStorage.getItem("zodexProjects") || "{}");
+      projectList.innerHTML = "";
+
+      Object.keys(projects).forEach(id => {
+        const project = projects[id];
+        const card = document.createElement("div");
+        card.className = "project-card";
+        card.innerHTML = `
+          <h3>${project.name}</h3>
+          <small>📅 ${project.date}</small><br/>
+          <button onclick="openProject('${id}')">Open</button>
+          <button onclick="deleteProject('${id}')">Delete</button>
+        `;
+        projectList.appendChild(card);
+      });
+
+      if (Object.keys(projects).length === 0) {
+        projectList.innerHTML = "<p style='text-align:center;'>No projects found.</p>";
+      }
+    }
+
+    function openProject(id) {
+      // Redirect to editor with project ID
+      window.location.href = `code-editor.html?project=${id}`;
+    }
+
+    function deleteProject(id) {
+      const projects = JSON.parse(localStorage.getItem("zodexProjects") || "{}");
+      delete projects[id];
+      localStorage.setItem("zodexProjects", JSON.stringify(projects));
+      loadProjects();
+    }
+
+    // Load all on startup
+    loadProjects();
+  </script>
+</body>
+</html>
