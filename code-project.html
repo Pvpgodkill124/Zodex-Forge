@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Zodex Projects</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: #00ff99;
+      font-family: 'Courier New', monospace;
+      padding: 10px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00ff99;
+    }
+
+    .project-list {
+      margin-top: 20px;
+    }
+
+    .project {
+      background: #000;
+      border: 1px solid #00ff99;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: #000;
+      color: #00ff99;
+      border: 1px solid #00ff99;
+      padding: 6px 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🗂️ Zodex Draft Projects</h1>
+
+  <div class="project-list" id="projectList"></div>
+
+  <div style="text-align: center;">
+    <button onclick="createNew()">➕ Create New Project</button>
+  </div>
+
+  <script>
+    const projectList = document.getElementById("projectList");
+
+    function loadProjects() {
+      projectList.innerHTML = "";
+      const html = localStorage.getItem("zodex-html");
+      const css = localStorage.getItem("zodex-css");
+      const js = localStorage.getItem("zodex-js");
+
+      if (html || css || js) {
+        const project = document.createElement("div");
+        project.className = "project";
+        project.innerHTML = `
+          <strong>Saved Draft</strong><br>
+          <button onclick="editProject()">✏️ Open in Editor</button>
+          <button onclick="deleteDraft()">🗑️ Delete</button>
+        `;
+        projectList.appendChild(project);
+      } else {
+        projectList.innerHTML = "<p style='text-align:center;'>No saved projects found.</p>";
+      }
+    }
+
+    function createNew() {
+      localStorage.removeItem("zodex-html");
+      localStorage.removeItem("zodex-css");
+      localStorage.removeItem("zodex-js");
+      window.location.href = "code-editor.html";
+    }
+
+    function editProject() {
+      window.location.href = "code-editor.html";
+    }
+
+    function deleteDraft() {
+      localStorage.removeItem("zodex-html");
+      localStorage.removeItem("zodex-css");
+      localStorage.removeItem("zodex-js");
+      loadProjects();
+    }
+
+    loadProjects();
+  </script>
+
+</body>
+</html>
