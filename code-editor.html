@@ -2,213 +2,215 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Zodex Forge V2 – Code Editor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zodex Forge - Code Editor</title>
   <style>
     body {
       margin: 0;
-      background: #0d0d0d;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    header {
       background: #111;
-      padding: 16px;
-      text-align: center;
-      font-size: 1.5rem;
-      color: #00ff88;
-      font-weight: bold;
-      border-bottom: 2px solid #00ff88;
-    }
-
-    #editor-container {
-      display: flex;
-      height: calc(100vh - 60px);
-    }
-
-    #codeInput {
-      width: 50%;
-      height: 100%;
-      padding: 12px;
-      border: none;
-      resize: none;
-      outline: none;
-      background: #1a1a1a;
-      color: #00ff88;
-      font-size: 16px;
+      color: #fff;
       font-family: monospace;
     }
 
-    #preview {
-      width: 50%;
-      height: 100%;
-      border-left: 2px solid #00ff88;
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      background: #222;
+      padding: 10px;
+      justify-content: center;
+    }
+
+    .tab-bar button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tab-bar button:hover {
+      background: #555;
+    }
+
+    .editor {
+      width: 100%;
+      height: 200px;
+      background: #000;
+      color: #0f0;
+      border: none;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      box-sizing: border-box;
+      resize: vertical;
     }
 
     iframe {
       width: 100%;
-      height: 100%;
-      border: none;
+      height: 250px;
+      border: 2px solid #555;
       background: #fff;
     }
 
-    #action-buttons {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
+    .controls {
+      margin-top: 10px;
+      padding: 10px;
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 1000;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
     }
 
-    .action-btn {
-      background: #00ff88;
-      color: #000;
+    input, select, button {
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 5px;
       border: none;
-      padding: 10px 16px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00ff88;
+      background: #222;
+      color: white;
     }
 
-    /* Export Popup */
-    #exportPopup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #00ff88;
-      z-index: 9999;
-      width: 300px;
-    }
-
-    #exportPopup h2 {
-      margin-top: 0;
-    }
-
-    #exportPopup input, #exportPopup select {
-      padding: 8px;
-      width: 100%;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 6px;
-    }
-
-    #exportPopup button {
-      padding: 10px 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    #exportPopup .confirm-btn {
-      background: #00ff88;
-      color: #000;
-    }
-
-    #exportPopup .cancel-btn {
+    button:hover {
       background: #444;
-      color: #fff;
-      margin-left: 10px;
+    }
+
+    #errorBox {
+      padding: 6px;
+      color: red;
+      text-align: center;
+      font-size: 13px;
     }
   </style>
 </head>
 <body>
 
-  <header>🚀 Zodex Forge – Code Awakens</header>
-
-  <main id="editor-container">
-    <textarea id="codeInput" placeholder="Write your HTML, CSS, JS here..."></textarea>
-    <div id="preview">
-      <iframe id="livePreview"></iframe>
-    </div>
-  </main>
-
-  <!-- 🔘 Buttons: Save + Export -->
-  <div id="action-buttons">
-    <button class="action-btn" onclick="saveCode()">💾 Save</button>
-    <button class="action-btn" onclick="openExportPopup()">📤 Export</button>
+  <div class="tab-bar">
+    <button onclick="switchTab('html')">HTML</button>
+    <button onclick="switchTab('css')">CSS</button>
+    <button onclick="switchTab('js')">JS</button>
   </div>
 
-  <!-- 📦 Export Popup -->
-  <div id="exportPopup">
-    <h2>📤 Export Your Code</h2>
-    <label>File name:</label>
-    <input type="text" id="fileNameInput" value="my-project">
-    <label>File type:</label>
-    <select id="fileTypeSelect">
-      <option value=".html">.html</option>
-      <option value=".css">.css</option>
-      <option value=".js">.js</option>
-      <option value=".txt">.txt</option>
+  <textarea id="htmlTab" class="editor" placeholder="Write HTML..."></textarea>
+  <textarea id="cssTab" class="editor" style="display:none;" placeholder="Write CSS..."></textarea>
+  <textarea id="jsTab" class="editor" style="display:none;" placeholder="Write JS..."></textarea>
+
+  <div id="errorBox"></div>
+
+  <iframe id="preview"></iframe>
+
+  <div class="controls">
+    <input type="text" id="fileName" placeholder="File name">
+    <select id="format">
+      <option value="html">.html</option>
+      <option value="css">.css</option>
+      <option value="js">.js</option>
+      <option value="txt">.txt</option>
     </select>
-    <button class="confirm-btn" onclick="exportCode()">✅ Export Now</button>
-    <button class="cancel-btn" onclick="closeExportPopup()">❌ Cancel</button>
+    <button id="downloadBtn">Export</button>
+    <button onclick="saveDraft()">💾 Save</button>
+    <button onclick="loadDraft()">📂 Load</button>
+    <button onclick="clearAll()">🗑 Clear</button>
   </div>
 
   <script>
-    // Live Preview
-    const codeInput = document.getElementById('codeInput');
-    const livePreview = document.getElementById('livePreview');
+    const htmlTab = document.getElementById("htmlTab");
+    const cssTab = document.getElementById("cssTab");
+    const jsTab = document.getElementById("jsTab");
+    const preview = document.getElementById("preview");
+
+    function switchTab(tab) {
+      htmlTab.style.display = "none";
+      cssTab.style.display = "none";
+      jsTab.style.display = "none";
+      document.getElementById(tab + "Tab").style.display = "block";
+    }
 
     function updatePreview() {
-      const code = codeInput.value;
-      livePreview.srcdoc = code;
+      const html = htmlTab.value;
+      const css = `<style>${cssTab.value}</style>`;
+      const js = `<script>${jsTab.value}<\/script>`;
+      const combined = html + "\n" + css + "\n" + js;
+      preview.srcdoc = combined;
+      validateHTML(html);
     }
 
-    codeInput.addEventListener('input', updatePreview);
-
-    // Save System
-    function saveCode() {
-      const code = codeInput.value;
-      localStorage.setItem('zodexCode', code);
-      alert('💾 Code saved locally!');
-    }
-
-    function loadSavedCode() {
-      const saved = localStorage.getItem('zodexCode');
-      if (saved) {
-        codeInput.value = saved;
-        updatePreview();
+    function validateHTML(html) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const errors = doc.querySelectorAll("parsererror");
+      const errorBox = document.getElementById("errorBox");
+      if (errors.length) {
+        errorBox.textContent = "⚠️ HTML Syntax Error Detected!";
+      } else {
+        errorBox.textContent = "";
       }
     }
 
-    // Export System
-    function openExportPopup() {
-      document.getElementById('exportPopup').style.display = 'block';
+    ["htmlTab", "cssTab", "jsTab"].forEach(id => {
+      document.getElementById(id).addEventListener("input", updatePreview);
+    });
+
+    function saveDraft() {
+      const data = {
+        html: htmlTab.value,
+        css: cssTab.value,
+        js: jsTab.value
+      };
+      localStorage.setItem("zodexCodeDraft", JSON.stringify(data));
+      alert("✅ Draft saved!");
     }
 
-    function closeExportPopup() {
-      document.getElementById('exportPopup').style.display = 'none';
+    function loadDraft() {
+      const data = JSON.parse(localStorage.getItem("zodexCodeDraft"));
+      if (data) {
+        htmlTab.value = data.html;
+        cssTab.value = data.css;
+        jsTab.value = data.js;
+        updatePreview();
+        alert("📂 Draft loaded!");
+      } else {
+        alert("No draft found.");
+      }
     }
 
-    function exportCode() {
-      const code = codeInput.value;
-      const fileName = document.getElementById('fileNameInput').value.trim() || 'my-project';
-      const fileType = document.getElementById('fileTypeSelect').value;
+    function clearAll() {
+      htmlTab.value = "";
+      cssTab.value = "";
+      jsTab.value = "";
+      preview.srcdoc = "";
+      localStorage.removeItem("zodexCodeDraft");
+      updatePreview();
+    }
 
-      const blob = new Blob([code], { type: 'text/plain' });
-      const link = document.createElement('a');
-      link.download = fileName + fileType;
+    // Export logic
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const format = document.getElementById("format").value;
+      const fileName = document.getElementById("fileName").value.trim();
+      if (!fileName) return alert("Enter a file name");
+
+      let content = "";
+      if (format === "html") {
+        content = `${htmlTab.value}\n<style>${cssTab.value}</style>\n<script>${jsTab.value}<\/script>`;
+      } else if (format === "css") {
+        content = cssTab.value;
+      } else if (format === "js") {
+        content = jsTab.value;
+      } else {
+        content = `${htmlTab.value}\n${cssTab.value}\n${jsTab.value}`;
+      }
+
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
+      link.download = `${fileName}.${format}`;
       link.click();
 
-      closeExportPopup();
-    }
+      // Clear draft after export
+      clearAll();
+    });
 
-    // Load on start
-    window.onload = loadSavedCode;
+    // Load if draft exists
+    window.onload = loadDraft;
   </script>
-
 </body>
 </html>
