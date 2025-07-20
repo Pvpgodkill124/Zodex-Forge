@@ -95,7 +95,6 @@
   <textarea id="jsTab" class="editor" style="display:none;" placeholder="Write JS..."></textarea>
 
   <div id="errorBox"></div>
-
   <iframe id="preview"></iframe>
 
   <div class="controls">
@@ -106,7 +105,7 @@
       <option value="js">.js</option>
       <option value="txt">.txt</option>
     </select>
-    <button id="downloadBtn">Export</button>
+    <button onclick="exportFile()">Export</button>
     <button onclick="saveDraft()">💾 Save</button>
     <button onclick="loadDraft()">📂 Load</button>
     <button onclick="clearAll()">🗑 Clear</button>
@@ -160,6 +159,7 @@
       alert("✅ Draft saved!");
     }
 
+    let loadedOnce = false;
     function loadDraft() {
       const data = JSON.parse(localStorage.getItem("zodexCodeDraft"));
       if (data) {
@@ -167,9 +167,12 @@
         cssTab.value = data.css;
         jsTab.value = data.js;
         updatePreview();
-        alert("📂 Draft loaded!");
+        if (!loadedOnce) {
+          alert("📂 Draft loaded!");
+          loadedOnce = true;
+        }
       } else {
-        alert("No draft found.");
+        if (!loadedOnce) alert("❌ No draft found.");
       }
     }
 
@@ -182,11 +185,11 @@
       updatePreview();
     }
 
-    // Export logic
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const format = document.getElementById("format").value;
+    function exportFile() {
       const fileName = document.getElementById("fileName").value.trim();
-      if (!fileName) return alert("Enter a file name");
+      const format = document.getElementById("format").value;
+
+      if (!fileName) return alert("❗ Please enter a file name.");
 
       let content = "";
       if (format === "html") {
@@ -200,17 +203,17 @@
       }
 
       const blob = new Blob([content], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `${fileName}.${format}`;
-      link.click();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${fileName}.${format}`;
+      a.click();
+    }
 
-      // Clear draft after export
-      clearAll();
-    });
-
-    // Load if draft exists
-    window.onload = loadDraft;
+    // Load once on page load
+    window.onload = () => {
+      loadDraft();
+      updatePreview();
+    };
   </script>
 </body>
 </html>
