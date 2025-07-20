@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Zodex Forge - Code Editor</title>
   <style>
     body {
@@ -43,6 +43,7 @@
       font-size: 14px;
       box-sizing: border-box;
       resize: vertical;
+      display: none;
     }
 
     iframe {
@@ -56,9 +57,9 @@
       margin-top: 10px;
       padding: 10px;
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     input, select, button {
@@ -73,13 +74,6 @@
     button:hover {
       background: #444;
     }
-
-    #errorBox {
-      padding: 6px;
-      color: red;
-      text-align: center;
-      font-size: 13px;
-    }
   </style>
 </head>
 <body>
@@ -91,24 +85,20 @@
   </div>
 
   <textarea id="htmlTab" class="editor" placeholder="Write HTML..."></textarea>
-  <textarea id="cssTab" class="editor" style="display:none;" placeholder="Write CSS..."></textarea>
-  <textarea id="jsTab" class="editor" style="display:none;" placeholder="Write JS..."></textarea>
+  <textarea id="cssTab" class="editor" placeholder="Write CSS..."></textarea>
+  <textarea id="jsTab" class="editor" placeholder="Write JS..."></textarea>
 
-  <div id="errorBox"></div>
   <iframe id="preview"></iframe>
 
   <div class="controls">
-    <input type="text" id="fileName" placeholder="File name">
+    <input type="text" id="fileName" placeholder="File name" />
     <select id="format">
       <option value="html">.html</option>
       <option value="css">.css</option>
       <option value="js">.js</option>
       <option value="txt">.txt</option>
     </select>
-    <button onclick="exportFile()">Export</button>
-    <button onclick="saveDraft()">💾 Save</button>
-    <button onclick="loadDraft()">📂 Load</button>
-    <button onclick="clearAll()">🗑 Clear</button>
+    <button id="downloadBtn">Export</button>
   </div>
 
   <script>
@@ -116,104 +106,71 @@
     const cssTab = document.getElementById("cssTab");
     const jsTab = document.getElementById("jsTab");
     const preview = document.getElementById("preview");
+    const editors = { html: htmlTab, css: cssTab, js: jsTab };
 
     function switchTab(tab) {
-      htmlTab.style.display = "none";
-      cssTab.style.display = "none";
-      jsTab.style.display = "none";
-      document.getElementById(tab + "Tab").style.display = "block";
+      for (let key in editors) {
+        editors[key].style.display = "none";
+      }
+      editors[tab].style.display = "block";
     }
 
     function updatePreview() {
       const html = htmlTab.value;
       const css = `<style>${cssTab.value}</style>`;
       const js = `<script>${jsTab.value}<\/script>`;
-      const combined = html + "\n" + css + "\n" + js;
-      preview.srcdoc = combined;
-      validateHTML(html);
+      preview.srcdoc = html + css + js;
+      autoSave();
     }
 
-    function validateHTML(html) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      const errors = doc.querySelectorAll("parsererror");
-      const errorBox = document.getElementById("errorBox");
-      if (errors.length) {
-        errorBox.textContent = "⚠️ HTML Syntax Error Detected!";
-      } else {
-        errorBox.textContent = "";
-      }
-    }
-
-    ["htmlTab", "cssTab", "jsTab"].forEach(id => {
-      document.getElementById(id).addEventListener("input", updatePreview);
-    });
-
-    function saveDraft() {
-      const data = {
+    function autoSave() {
+      const draft = {
         html: htmlTab.value,
         css: cssTab.value,
         js: jsTab.value
       };
-      localStorage.setItem("zodexCodeDraft", JSON.stringify(data));
-      alert("✅ Draft saved!");
+      localStorage.setItem("zodexDraft", JSON.stringify(draft));
     }
 
-    let loadedOnce = false;
     function loadDraft() {
-      const data = JSON.parse(localStorage.getItem("zodexCodeDraft"));
-      if (data) {
-        htmlTab.value = data.html;
-        cssTab.value = data.css;
-        jsTab.value = data.js;
+      const draft = JSON.parse(localStorage.getItem("zodexDraft"));
+      if (draft) {
+        htmlTab.value = draft.html || "";
+        cssTab.value = draft.css || "";
+        jsTab.value = draft.js || "";
         updatePreview();
-        if (!loadedOnce) {
-          alert("📂 Draft loaded!");
-          loadedOnce = true;
-        }
-      } else {
-        if (!loadedOnce) alert("❌ No draft found.");
       }
     }
 
-    function clearAll() {
-      htmlTab.value = "";
-      cssTab.value = "";
-      jsTab.value = "";
-      preview.srcdoc = "";
-      localStorage.removeItem("zodexCodeDraft");
-      updatePreview();
-    }
+    document.querySelectorAll(".editor").forEach(el => {
+      el.addEventListener("input", updatePreview);
+    });
 
-    function exportFile() {
-      const fileName = document.getElementById("fileName").value.trim();
+    document.getElementById("downloadBtn").addEventListener("click", () => {
       const format = document.getElementById("format").value;
-
-      if (!fileName) return alert("❗ Please enter a file name.");
-
+      const fileName = document.getElementById("fileName").value.trim() || "project";
       let content = "";
+
       if (format === "html") {
-        content = `${htmlTab.value}\n<style>${cssTab.value}</style>\n<script>${jsTab.value}<\/script>`;
+        content = htmlTab.value + `\n<style>${cssTab.value}</style>\n<script>${jsTab.value}<\/script>`;
       } else if (format === "css") {
         content = cssTab.value;
       } else if (format === "js") {
         content = jsTab.value;
       } else {
-        content = `${htmlTab.value}\n${cssTab.value}\n${jsTab.value}`;
+        content = htmlTab.value + "\n" + cssTab.value + "\n" + jsTab.value;
       }
 
       const blob = new Blob([content], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `${fileName}.${format}`;
-      a.click();
-    }
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${fileName}.${format}`;
+      link.click();
+    });
 
-    // Load once on page load
-    window.onload = () => {
-      loadDraft();
-      updatePreview();
-    };
+    // Start
+    switchTab("html");
+    loadDraft();
   </script>
 </body>
 </html>
