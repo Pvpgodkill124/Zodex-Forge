@@ -1,25 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Zodex Forge - Code Editor</title>
   <style>
     body {
       margin: 0;
-      background: #111;
+      background: #0e0e0e;
       color: #fff;
       font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
     header {
-      background: #222;
+      background: #111;
       padding: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      color: #0ff;
     }
     header h2 {
       margin: 0;
-      color: #0ff;
+      font-size: 18px;
     }
     header button {
       margin-left: 10px;
@@ -31,50 +34,90 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .tab-buttons {
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+    }
+    .tab-buttons button {
+      flex: 1;
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .tab-buttons button.active {
+      background: #0ff;
+      color: #000;
+    }
+    .editor-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .code-area {
+      flex: 1;
+      display: none;
+    }
     textarea {
-      width: 33.33%;
-      height: 80vh;
+      width: 100%;
+      height: 100%;
       background: #222;
       color: #0f0;
       border: none;
       padding: 10px;
       resize: none;
+      font-size: 14px;
+    }
+    .preview {
+      height: 40vh;
+      background: white;
     }
     iframe {
       width: 100%;
       height: 100%;
       border: none;
-      background: white;
     }
-    .editor {
+    footer {
+      background: #111;
+      color: #0ff;
+      padding: 10px;
       display: flex;
-    }
-    .preview {
-      height: 20vh;
+      justify-content: space-between;
+      align-items: center;
     }
   </style>
 </head>
-<body>
-
-<header>
-  <h2>Zodex Forge Editor</h2>
+<body><header>
+  <h2>Zodex Editor – The Code Awakens</h2>
   <div>
     <button onclick="exportProject()">Export</button>
     <button onclick="goHome()">My Projects</button>
   </div>
-</header>
-
-<div class="editor">
-  <textarea id="html" placeholder="HTML Code"></textarea>
-  <textarea id="css" placeholder="CSS Code"></textarea>
-  <textarea id="js" placeholder="JS Code"></textarea>
-</div>
-
-<div class="preview">
+</header><div class="tab-buttons">
+  <button onclick="switchTab('html')" class="active">HTML</button>
+  <button onclick="switchTab('css')">CSS</button>
+  <button onclick="switchTab('js')">JS</button>
+</div><div class="editor-container">
+  <div class="code-area" id="htmlTab" style="display: block">
+    <textarea id="html" placeholder="HTML Code"></textarea>
+  </div>
+  <div class="code-area" id="cssTab">
+    <textarea id="css" placeholder="CSS Code"></textarea>
+  </div>
+  <div class="code-area" id="jsTab">
+    <textarea id="js" placeholder="JS Code"></textarea>
+  </div>
+</div><div class="preview">
   <iframe id="preview"></iframe>
-</div>
-
-<script>
+</div><footer>
+  <span>Live Preview ⚡️</span>
+  <div>
+    <button onclick="exportProject()">Export</button>
+    <button onclick="goHome()">My Projects</button>
+  </div>
+</footer><script>
   const htmlInput = document.getElementById("html");
   const cssInput = document.getElementById("css");
   const jsInput = document.getElementById("js");
@@ -82,7 +125,6 @@
 
   let projectId = null;
 
-  // Load project from query string
   function getParams() {
     const url = new URLSearchParams(window.location.search);
     if (url.has("project")) {
@@ -97,17 +139,16 @@
       }
     } else if (url.get("new") === "true") {
       projectId = "project_" + Date.now();
-      saveProject(); // Initialize blank project
+      saveProject();
     }
   }
 
-  // Save project every 1.5 seconds
   function autoSave() {
     setInterval(() => {
       if (!projectId) return;
       const allProjects = JSON.parse(localStorage.getItem("zodexProjects") || "{}");
       allProjects[projectId] = {
-        name: allProjects[projectId]?.name || prompt("Enter project name") || "Untitled",
+        name: allProjects[projectId]?.name || "Untitled",
         html: htmlInput.value,
         css: cssInput.value,
         js: jsInput.value,
@@ -117,56 +158,22 @@
     }, 1500);
   }
 
-  // Update live preview
   function updatePreview() {
     const html = htmlInput.value;
-    const css = `<style>${cssInput.value}</style>`;
-    const js = `<script>${jsInput.value}<\/script>`;
-    preview.srcdoc = `${html}${css}${js}`;
-  }
+    const css = `<style>${cssInput.value}</style>`;const js = `<script>${jsInput.value}<\/script>`;
+preview.srcdoc = `${html}${css}${js}`;
 
-  // Export project to .html
-  function exportProject() {
-    const fileContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>${projectId}</title>
-  <style>${cssInput.value}</style>
-</head>
-<body>
-${htmlInput.value}
-<script>${jsInput.value}<\/script>
-</body>
-</html>`.trim();
+}
 
-    const blob = new Blob([fileContent], { type: "text/html" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `${projectId}.html`;
-    a.click();
+function exportProject() { const content = <!DOCTYPE html><html><head><meta charset='UTF-8'><style>${cssInput.value}</style></head><body>${htmlInput.value}<script>${jsInput.value}<\/script></body></html>; const blob = new Blob([content], { type: "text/html" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = ${projectId}.html; a.click(); const projects = JSON.parse(localStorage.getItem("zodexProjects") || "{}"); delete projects[projectId]; localStorage.setItem("zodexProjects", JSON.stringify(projects)); goHome(); }
 
-    // After export, delete the project (fresh start)
-    const projects = JSON.parse(localStorage.getItem("zodexProjects") || "{}");
-    delete projects[projectId];
-    localStorage.setItem("zodexProjects", JSON.stringify(projects));
-    window.location.href = "code-project.html";
-  }
+function goHome() { window.location.href = "code-project.html"; }
 
-  function goHome() {
-    window.location.href = "code-project.html";
-  }
+function switchTab(tab) { document.querySelectorAll('.tab-buttons button').forEach(btn => btn.classList.remove('active')); document.querySelector(.tab-buttons button[onclick*="${tab}"]).classList.add('active'); document.querySelectorAll('.code-area').forEach(area => area.style.display = 'none'); document.getElementById(${tab}Tab).style.display = 'block'; }
 
-  // Live update
-  htmlInput.addEventListener("input", updatePreview);
-  cssInput.addEventListener("input", updatePreview);
-  jsInput.addEventListener("input", updatePreview);
+htmlInput.addEventListener("input", updatePreview); cssInput.addEventListener("input", updatePreview); jsInput.addEventListener("input", updatePreview);
 
-  getParams();
-  updatePreview();
-  autoSave();
-</script>
+getParams(); updatePreview(); autoSave(); </script>
 
 </body>
 </html>
