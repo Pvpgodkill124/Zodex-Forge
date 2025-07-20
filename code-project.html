@@ -1,100 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- code-editor.html --><!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Projects – Zodex Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zodex Editor – The Code Awakens</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0f0f0f;
-      color: #fff;
+      font-family: sans-serif;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100vh;
     }
-
-    header {
-      background-color: #1e1e1e;
-      padding: 16px;
-      font-size: 1.5em;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    li {
-      background: #1a1a1a;
-      margin: 8px 16px;
-      padding: 14px;
-      border-radius: 8px;
+    .tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: #222;
+      color: white;
+      justify-content: space-around;
+      padding: 10px;
     }
-
-    button {
-      padding: 6px 12px;
-      border: none;
-      background-color: #00d8ff;
-      color: #000;
-      font-weight: bold;
-      border-radius: 5px;
+    .tab {
       cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 6px;
+      background: #333;
     }
-
+    .tab.active {
+      background: #ff5252;
+    }
+    .editor-container {
+      display: flex;
+      flex: 1;
+    }
+    .editor {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+    }
+    .editor.active {
+      display: flex;
+    }
+    textarea {
+      flex: 1;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      resize: none;
+      border: none;
+      outline: none;
+    }
+    iframe {
+      flex: 1;
+      border: none;
+    }
     footer {
-      margin-top: auto;
-      background-color: #111;
       text-align: center;
       padding: 10px;
-      font-size: 0.9em;
-      color: #aaa;
+      background: #111;
+      color: white;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 4px;
+      background: #ff5252;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <header>🗂 My Projects</header>
+  <div class="tabs">
+    <div class="tab active" data-tab="html">HTML</div>
+    <div class="tab" data-tab="css">CSS</div>
+    <div class="tab" data-tab="js">JS</div>
+  </div>  <div class="editor-container">
+    <div class="editor active" id="html-editor">
+      <textarea id="htmlCode" placeholder="Write HTML..."></textarea>
+    </div>
+    <div class="editor" id="css-editor">
+      <textarea id="cssCode" placeholder="Write CSS..."></textarea>
+    </div>
+    <div class="editor" id="js-editor">
+      <textarea id="jsCode" placeholder="Write JavaScript..."></textarea>
+    </div>
+    <iframe id="preview"></iframe>
+  </div>  <div class="actions">
+    <button onclick="exportCode()">Export</button>
+    <button onclick="goToProjects()">My Projects</button>
+  </div>  <footer>
+    Live Preview ⚡️ by Zodex™
+  </footer>  <script>
+    const tabs = document.querySelectorAll(".tab");
+    const editors = document.querySelectorAll(".editor");
 
-  <ul id="projectList">
-    <!-- Saved projects will show here -->
-  </ul>
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        editors.forEach(e => e.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(`${tab.dataset.tab}-editor`).classList.add("active");
+      });
+    });
 
-  <footer>Saved with Zodex Editor ⚡</footer>
+    const htmlCode = document.getElementById("htmlCode");
+    const cssCode = document.getElementById("cssCode");
+    const jsCode = document.getElementById("jsCode");
+    const preview = document.getElementById("preview");
 
-  <script>
-    // Only one draft for now: Default
-    const html = localStorage.getItem("html");
-    const css = localStorage.getItem("css");
-    const js = localStorage.getItem("js");
+    function updatePreview() {
+      const html = htmlCode.value;
+      const css = `<style>${cssCode.value}</style>`;const js = `<script>${jsCode.value}<\/script>`;
+  const output = `${html}\n${css}\n${js}`;
+  const blob = new Blob([output], { type: "text/html" });
+  preview.src = URL.createObjectURL(blob);
+}
 
-    const projectList = document.getElementById("projectList");
+htmlCode.addEventListener("input", updatePreview);
+cssCode.addEventListener("input", updatePreview);
+jsCode.addEventListener("input", updatePreview);
 
-    if (html || css || js) {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <div>
-          <strong>Zodex Forge Draft</strong><br>
-          Last saved: ${new Date().toLocaleString()}
-        </div>
-        <button onclick="loadDraft()">Open</button>
-      `;
-      projectList.appendChild(li);
-    } else {
-      const li = document.createElement("li");
-      li.innerHTML = `<div>No drafts found. Start building in the editor!</div>`;
-      projectList.appendChild(li);
-    }
+function exportCode() {
+  const html = htmlCode.value;
+  const css = `<style>${cssCode.value}</style>`;
+  const js = `<script>${jsCode.value}<\/script>`;
+  const fullCode = `${html}\n${css}\n${js}`;
 
-    function loadDraft() {
-      window.location.href = "code-editor.html";
-    }
+  const blob = new Blob([fullCode], { type: "text/html" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "zodex-export.html";
+  a.click();
+
+  htmlCode.value = "";
+  cssCode.value = "";
+  jsCode.value = "";
+  updatePreview();
+}
+
+function goToProjects() {
+  window.location.href = "code-project.html";
+}
+
+updatePreview();
+
   </script>
 </body>
 </html>
