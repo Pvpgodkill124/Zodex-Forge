@@ -2,77 +2,172 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Zodex Forge - Scratch Mode</title>
+  <title>Zodex Forge Scratch</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      margin: 0;
-      background: #121212;
-      color: #fff;
+      background: #111;
+      color: white;
       font-family: sans-serif;
+      margin: 0;
+      padding: 0;
     }
     header, footer {
-      background: #1e1e1e;
-      padding: 10px;
       text-align: center;
-      color: #00f9ff;
+      padding: 10px;
+      background: #222;
     }
-    #main {
+    #blocklyDiv {
+      height: 400px;
+      width: 100%;
+    }
+    .controls {
       display: flex;
-      height: calc(100vh - 120px);
-    }
-    #blocklyArea {
-      width: 50%;
-      height: 100%;
-    }
-    #rightPane {
-      width: 50%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
+      justify-content: center;
+      margin: 10px;
     }
     iframe {
-      flex-grow: 1;
-      border: none;
+      border: 1px solid #444;
+      width: 100%;
+      height: 300px;
       background: white;
-    }
-    #buttons {
-      padding: 10px;
-      background: #1e1e1e;
-      text-align: center;
     }
     button {
       margin: 5px;
-      padding: 8px 12px;
-      font-weight: bold;
-      background: #00f9ff;
+      padding: 8px 15px;
+      background: #444;
+      color: white;
       border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #00c2d3;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <header>Zodex Forge - Scratch Mode</header>
 
-  <div id="main">
-    <div id="blocklyArea"></div>
-    <div id="rightPane">
-      <iframe id="preview"></iframe>
-      <div id="buttons">
-        <button onclick="saveCode()">💾 Save Draft</button>
-        <button onclick="exportCode()">⬇️ Export</button>
-        <button onclick="location.href='scratch-project.html'">📂 Project</button>
-      </div>
-    </div>
-  </div>
+<header>
+  <h1>Zodex Forge - Scratch Mode</h1>
+</header>
 
-  <footer>DR1TRA-GAMING | Zodex Forge V1 Scratch Mode</footer>
+<div id="blocklyDiv"></div>
 
-  <script src="scratch.js"></script>
+<xml id="toolbox" style="display: none">
+  <category name="HTML" colour="#5BA58C">
+    <block type="html_body"></block>
+    <block type="html_heading"></block>
+    <block type="html_paragraph"></block>
+  </category>
+  <category name="JavaScript" colour="#5C81A6">
+    <block type="alert_block"></block>
+  </category>
+</xml>
+
+<div class="controls">
+  <button onclick="runCode()">⚡ Live Preview</button>
+  <button onclick="saveDraft()">💾 Save Draft</button>
+  <button onclick="exportCode()">⬇️ Export</button>
+  <button onclick="goToProjects()">📁 Projects</button>
+</div>
+
+<iframe id="preview"></iframe>
+
+<footer>DR1TRA-GAMING | Zodex Scratch V1</footer>
+
+<script>
+  const workspace = Blockly.inject('blocklyDiv', {
+    toolbox: document.getElementById('toolbox'),
+    theme: Blockly.Themes.Dark,
+  });
+
+  // BLOCK DEFINITIONS
+  Blockly.defineBlocksWithJsonArray([
+    {
+      "type": "html_body",
+      "message0": "<body> %1 </body>",
+      "args0": [{ "type": "input_statement", "name": "content" }],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": 160
+    },
+    {
+      "type": "html_heading",
+      "message0": "<h1> %1 </h1>",
+      "args0": [{ "type": "field_input", "name": "text", "text": "Heading" }],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": 210
+    },
+    {
+      "type": "html_paragraph",
+      "message0": "<p> %1 </p>",
+      "args0": [{ "type": "field_input", "name": "text", "text": "Paragraph" }],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": 210
+    },
+    {
+      "type": "alert_block",
+      "message0": "alert %1",
+      "args0": [{ "type": "field_input", "name": "text", "text": "Hello!" }],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": 230
+    }
+  ]);
+
+  // GENERATOR CODE
+  Blockly.JavaScript['html_body'] = function (block) {
+    const content = Blockly.JavaScript.statementToCode(block, 'content');
+    return `<body>\n${content}</body>\n`;
+  };
+  Blockly.JavaScript['html_heading'] = function (block) {
+    const text = block.getFieldValue('text');
+    return `<h1>${text}</h1>\n`;
+  };
+  Blockly.JavaScript['html_paragraph'] = function (block) {
+    const text = block.getFieldValue('text');
+    return `<p>${text}</p>\n`;
+  };
+  Blockly.JavaScript['alert_block'] = function (block) {
+    const text = block.getFieldValue('text');
+    return `alert("${text}");\n`;
+  };
+
+  // LIVE PREVIEW
+  function runCode() {
+    const code = Blockly.JavaScript.workspaceToCode(workspace);
+    const html = `<html><head><script>${code}<\/script></head><body style="background:#fff;color:#000">${code}</body></html>`;
+    const iframe = document.getElementById('preview');
+    iframe.srcdoc = html;
+  }
+
+  // SAVE TO DRAFT
+  function saveDraft() {
+    const xml = Blockly.Xml.workspaceToDom(workspace);
+    localStorage.setItem("zodex-scratch", Blockly.Xml.domToText(xml));
+  }
+
+  // EXPORT CODE
+  function exportCode() {
+    const code = Blockly.JavaScript.workspaceToCode(workspace);
+    const blob = new Blob([code], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "zodex-scratch.html";
+    a.click();
+  }
+
+  // LOAD ON START
+  window.onload = () => {
+    const saved = localStorage.getItem("zodex-scratch");
+    if (saved) {
+      Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(saved), workspace);
+    }
+  };
+
+  function goToProjects() {
+    window.location.href = "scratch-project.html";
+  }
+</script>
+
 </body>
 </html>
