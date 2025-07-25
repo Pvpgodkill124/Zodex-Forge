@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Zodex Forge - Scratch Mode</title>
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      color: #fff;
+      font-family: sans-serif;
+    }
+    header, footer {
+      background: #1e1e1e;
+      padding: 10px;
+      text-align: center;
+      color: #00f9ff;
+    }
+    #main {
+      display: flex;
+      height: calc(100vh - 120px);
+    }
+    #blocklyArea {
+      width: 50%;
+      height: 100%;
+    }
+    #rightPane {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    iframe {
+      flex-grow: 1;
+      border: none;
+      background: white;
+    }
+    #buttons {
+      padding: 10px;
+      background: #1e1e1e;
+      text-align: center;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-weight: bold;
+      background: #00f9ff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #00c2d3;
+    }
+  </style>
+</head>
+<body>
+  <header>Zodex Forge - Scratch Mode</header>
+
+  <div id="main">
+    <div id="blocklyArea"></div>
+    <div id="rightPane">
+      <iframe id="preview"></iframe>
+      <div id="buttons">
+        <button onclick="saveCode()">💾 Save Draft</button>
+        <button onclick="exportCode()">⬇️ Export</button>
+        <button onclick="location.href='scratch-project.html'">📂 Project</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>DR1TRA-GAMING | Zodex Forge V1 Scratch Mode</footer>
+
+  <script src="scratch.js"></script>
+</body>
+</html>
