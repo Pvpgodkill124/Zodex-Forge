@@ -1,173 +1,215 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Zodex Forge Scratch</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zodex Forge - Scratch Mode</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      background: #111;
-      color: white;
-      font-family: sans-serif;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f0f0f;
+      color: #ffffff;
     }
-    header, footer {
+    header {
+      background-color: #1a1a1a;
+      padding: 12px;
       text-align: center;
-      padding: 10px;
-      background: #222;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 2px solid #2c2c2c;
     }
-    #blocklyDiv {
-      height: 400px;
+    #blocklyArea {
+      height: 420px;
       width: 100%;
     }
-    .controls {
+    iframe#preview {
+      width: 100%;
+      height: 250px;
+      background: #fff;
+      border: none;
+      margin-top: 5px;
+    }
+    .btn-bar {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      margin: 10px;
-    }
-    iframe {
-      border: 1px solid #444;
-      width: 100%;
-      height: 300px;
-      background: white;
+      gap: 10px;
+      padding: 10px;
+      background: #1b1b1b;
+      border-top: 2px solid #2c2c2c;
+      border-bottom: 2px solid #2c2c2c;
     }
     button {
-      margin: 5px;
-      padding: 8px 15px;
-      background: #444;
-      color: white;
+      background-color: #2a2a2a;
+      color: #fff;
       border: none;
       border-radius: 6px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    button:hover {
+      background-color: #444;
+    }
+    footer {
+      background-color: #1a1a1a;
+      color: #888;
+      text-align: center;
+      padding: 10px;
+      font-size: 13px;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
+  <header>⚙️ Zodex Forge - Scratch Mode</header>
 
-<header>
-  <h1>Zodex Forge - Scratch Mode</h1>
-</header>
+  <div id="blocklyArea"></div>
 
-<div id="blocklyDiv"></div>
+  <div class="btn-bar">
+    <button onclick="livePreview()">⚡ Live Preview</button>
+    <button onclick="saveDraft()">💾 Save Draft</button>
+    <button onclick="exportHTML()">📤 Export HTML</button>
+    <button onclick="goToProjects()">📁 Projects</button>
+  </div>
 
-<xml id="toolbox" style="display: none">
-  <category name="HTML" colour="#5BA58C">
-    <block type="html_body"></block>
-    <block type="html_heading"></block>
-    <block type="html_paragraph"></block>
-  </category>
-  <category name="JavaScript" colour="#5C81A6">
-    <block type="alert_block"></block>
-  </category>
-</xml>
+  <iframe id="preview"></iframe>
 
-<div class="controls">
-  <button onclick="runCode()">⚡ Live Preview</button>
-  <button onclick="saveDraft()">💾 Save Draft</button>
-  <button onclick="exportCode()">⬇️ Export</button>
-  <button onclick="goToProjects()">📁 Projects</button>
-</div>
+  <footer>DR1TRA-GAMING | Zodex Scratch V1</footer>
 
-<iframe id="preview"></iframe>
+  <!-- Blockly toolbox -->
+  <xml id="toolbox" style="display: none">
+    <category name="HTML" colour="120">
+      <block type="html_body"></block>
+      <block type="html_heading"></block>
+      <block type="html_paragraph"></block>
+    </category>
+    <category name="JavaScript" colour="260">
+      <block type="js_alert"></block>
+    </category>
+  </xml>
 
-<footer>DR1TRA-GAMING | Zodex Scratch V1</footer>
+  <script>
+    // Define blocks
+    Blockly.defineBlocksWithJsonArray([
+      {
+        type: "html_body",
+        message0: "<body> %1 </body>",
+        args0: [{ type: "input_statement", name: "BODY" }],
+        previousStatement: null,
+        nextStatement: null,
+        colour: 120,
+        tooltip: "Body tag",
+      },
+      {
+        type: "html_heading",
+        message0: "<h1> %1 </h1>",
+        args0: [{ type: "field_input", name: "TEXT", text: "Heading" }],
+        previousStatement: null,
+        nextStatement: null,
+        colour: 120,
+        tooltip: "Heading tag",
+      },
+      {
+        type: "html_paragraph",
+        message0: "<p> %1 </p>",
+        args0: [{ type: "field_input", name: "TEXT", text: "Paragraph" }],
+        previousStatement: null,
+        nextStatement: null,
+        colour: 120,
+        tooltip: "Paragraph tag",
+      },
+      {
+        type: "js_alert",
+        message0: "alert %1",
+        args0: [{ type: "field_input", name: "TEXT", text: "Hello!" }],
+        previousStatement: null,
+        nextStatement: null,
+        colour: 260,
+        tooltip: "JS Alert",
+      },
+    ]);
 
-<script>
-  const workspace = Blockly.inject('blocklyDiv', {
-    toolbox: document.getElementById('toolbox'),
-    theme: Blockly.Themes.Dark,
-  });
+    // Code generation logic
+    Blockly.JavaScript['html_body'] = function(block) {
+      const statements = Blockly.JavaScript.statementToCode(block, 'BODY');
+      return `<body>\n${statements}</body>\n`;
+    };
+    Blockly.JavaScript['html_heading'] = function(block) {
+      const text = block.getFieldValue('TEXT');
+      return `<h1>${text}</h1>\n`;
+    };
+    Blockly.JavaScript['html_paragraph'] = function(block) {
+      const text = block.getFieldValue('TEXT');
+      return `<p>${text}</p>\n`;
+    };
+    Blockly.JavaScript['js_alert'] = function(block) {
+      const text = block.getFieldValue('TEXT');
+      return `alert("${text}");\n`;
+    };
 
-  // BLOCK DEFINITIONS
-  Blockly.defineBlocksWithJsonArray([
-    {
-      "type": "html_body",
-      "message0": "<body> %1 </body>",
-      "args0": [{ "type": "input_statement", "name": "content" }],
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": 160
-    },
-    {
-      "type": "html_heading",
-      "message0": "<h1> %1 </h1>",
-      "args0": [{ "type": "field_input", "name": "text", "text": "Heading" }],
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": 210
-    },
-    {
-      "type": "html_paragraph",
-      "message0": "<p> %1 </p>",
-      "args0": [{ "type": "field_input", "name": "text", "text": "Paragraph" }],
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": 210
-    },
-    {
-      "type": "alert_block",
-      "message0": "alert %1",
-      "args0": [{ "type": "field_input", "name": "text", "text": "Hello!" }],
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": 230
+    // Setup Blockly workspace
+    const workspace = Blockly.inject('blocklyArea', {
+      toolbox: document.getElementById('toolbox'),
+      theme: Blockly.Themes.Dark,
+    });
+
+    // Live preview function
+    function livePreview() {
+      const code = Blockly.JavaScript.workspaceToCode(workspace);
+      const fullHTML = `
+        <!DOCTYPE html>
+        <html>
+          <head><meta charset="UTF-8"><title>Preview</title></head>
+          ${code.includes('<body>') ? code : `<body>${code}</body>`}
+        </html>
+      `;
+      document.getElementById('preview').srcdoc = fullHTML;
     }
-  ]);
 
-  // GENERATOR CODE
-  Blockly.JavaScript['html_body'] = function (block) {
-    const content = Blockly.JavaScript.statementToCode(block, 'content');
-    return `<body>\n${content}</body>\n`;
-  };
-  Blockly.JavaScript['html_heading'] = function (block) {
-    const text = block.getFieldValue('text');
-    return `<h1>${text}</h1>\n`;
-  };
-  Blockly.JavaScript['html_paragraph'] = function (block) {
-    const text = block.getFieldValue('text');
-    return `<p>${text}</p>\n`;
-  };
-  Blockly.JavaScript['alert_block'] = function (block) {
-    const text = block.getFieldValue('text');
-    return `alert("${text}");\n`;
-  };
-
-  // LIVE PREVIEW
-  function runCode() {
-    const code = Blockly.JavaScript.workspaceToCode(workspace);
-    const html = `<html><head><script>${code}<\/script></head><body style="background:#fff;color:#000">${code}</body></html>`;
-    const iframe = document.getElementById('preview');
-    iframe.srcdoc = html;
-  }
-
-  // SAVE TO DRAFT
-  function saveDraft() {
-    const xml = Blockly.Xml.workspaceToDom(workspace);
-    localStorage.setItem("zodex-scratch", Blockly.Xml.domToText(xml));
-  }
-
-  // EXPORT CODE
-  function exportCode() {
-    const code = Blockly.JavaScript.workspaceToCode(workspace);
-    const blob = new Blob([code], { type: "text/html" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "zodex-scratch.html";
-    a.click();
-  }
-
-  // LOAD ON START
-  window.onload = () => {
-    const saved = localStorage.getItem("zodex-scratch");
-    if (saved) {
-      Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(saved), workspace);
+    // Save draft to localStorage
+    function saveDraft() {
+      const xml = Blockly.Xml.workspaceToDom(workspace);
+      const xmlText = Blockly.Xml.domToText(xml);
+      localStorage.setItem("scratchDraft", xmlText);
+      alert("✅ Draft saved!");
     }
-  };
 
-  function goToProjects() {
-    window.location.href = "scratch-project.html";
-  }
-</script>
+    // Export as HTML file
+    function exportHTML() {
+      const code = Blockly.JavaScript.workspaceToCode(workspace);
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head><meta charset="UTF-8"><title>Zodex Scratch Export</title></head>
+          ${code.includes('<body>') ? code : `<body>${code}</body>`}
+        </html>
+      `;
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "zodex-scratch-export.html";
+      a.click();
+    }
 
+    // Go to saved projects
+    function goToProjects() {
+      window.location.href = "scratch-project.html";
+    }
+
+    // Load saved draft on startup
+    window.onload = () => {
+      const draft = localStorage.getItem("scratchDraft");
+      if (draft) {
+        const xml = Blockly.Xml.textToDom(draft);
+        Blockly.Xml.domToWorkspace(xml, workspace);
+      }
+    };
+  </script>
 </body>
 </html>
