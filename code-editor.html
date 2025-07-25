@@ -105,6 +105,7 @@
     function updatePreview() {
       const code = htmlCode.value;
       preview.srcdoc = code;
+      preview.srcdoc = htmlCode.value || "<body style='background-color: black; color: white;'>Live Preview</body>";
     }
 
     function openTab(page) {
